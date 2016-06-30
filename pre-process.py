@@ -2,6 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 from scipy import signal
+import argparse
+import sys
 
 # Generate a sliding window of wl dimension
 def win_iter(l, wl = 5):
@@ -14,7 +16,7 @@ def win_iter(l, wl = 5):
 # Reduces noise in a 2-step process.
 def remove_noise(arr_0):
     arr_1 = signal.detrend(arr_0)
-    arr_2 = signal.savgol_filter(arr_1, 5, 4)
+    arr_2 = signal.savgol_filter(arr_1, 51, 3)
     return arr_2
 
 
@@ -56,12 +58,17 @@ def remove_background(spectrum, wl, idx, deg):
 
 
 if __name__ == '__main__':
+    # read command line args
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--name', required = True, help = 'Name of file.')
+    name = vars(parser.parse_args(sys.argv[1:]))['name']
+
     # Set the working directory
     prjdir = '.'
 
-    # Read the data from a csv file. Columns separated by \t.
+    # Read the data from a csv file. Columns separated by ','.
     # The first line of the file contains the scanned wavelengths
-    tmpdata = np.loadtxt(os.path.join(prjdir, 'marzipan.csv'), delimiter='\t')
+    tmpdata = np.loadtxt(os.path.join(prjdir, name), delimiter=',')
     wl = tmpdata[0]
     spectrum = tmpdata[1:]
 
